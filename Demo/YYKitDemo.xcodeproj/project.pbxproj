@@ -521,7 +521,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9B25F9E1BEE79280038C00A /* WebP.framework in Frameworks */,
-				D9B25F9D1BEE79280038C00A /* bpg.framework in Frameworks */,
 				D9700D9E1BC7D44B00F878A4 /* libsqlite3.tbd in Frameworks */,
 				D9700D9C1BC7D44500F878A4 /* libz.tbd in Frameworks */,
 				D974851619CAB38900F46DE1 /* UIKit.framework in Frameworks */,
@@ -1500,6 +1499,14 @@
 					"$(PROJECT_DIR)/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
+				"OTHER_LDFLAGS[sdk=iphonesimulator*]" = (
+					"-ObjC",
+					"-Wl,-framework,WebP",
+				);
+				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]" = (
+					YYBPGCoder.m,
+					YYImageBenchmark.m,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibireme.YYKitDemo;
 				PRODUCT_NAME = YYKitDemo;
 				STRIP_PNG_TEXT = NO;
@@ -1529,6 +1536,14 @@
 					"$(PROJECT_DIR)/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
+				"OTHER_LDFLAGS[sdk=iphonesimulator*]" = (
+					"-ObjC",
+					"-Wl,-framework,WebP",
+				);
+				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]" = (
+					YYBPGCoder.m,
+					YYImageBenchmark.m,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibireme.YYKitDemo;
 				PRODUCT_NAME = YYKitDemo;
 				STRIP_PNG_TEXT = NO;
