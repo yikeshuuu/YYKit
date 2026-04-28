@@ -15,6 +15,14 @@
 
 #define kToolbarHeight (35 + 46)
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
+
 @interface WBStatusComposeViewController() <YYTextViewDelegate, YYTextKeyboardObserver, WBStatusComposeEmoticonViewDelegate>
 
 @property (nonatomic, strong) YYTextView *textView;
@@ -47,10 +55,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    if ([self respondsToSelector:@selector( setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    
     
     [self _initNavBar];
     [self _initTextView];
@@ -84,7 +88,7 @@
     if (kSystemVersion < 7) _textView.top = -64;
     _textView.size = CGSizeMake(self.view.width, self.view.height);
     _textView.textContainerInset = UIEdgeInsetsMake(12, 16, 12, 16);
-    _textView.contentInset = UIEdgeInsetsMake(64, 0, kToolbarHeight, 0);
+    _textView.contentInset = UIEdgeInsetsMake(YYDemoTopLayoutInset(self), 0, kToolbarHeight, 0);
     _textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _textView.extraAccessoryViewHeight = kToolbarHeight;
     _textView.showsVerticalScrollIndicator = NO;

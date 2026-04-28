@@ -224,6 +224,7 @@
 @interface YYPhotoGroupView() <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 @property (nonatomic, weak) UIView *fromView;
 @property (nonatomic, weak) UIView *toContainerView;
+@property (nonatomic, weak) UIViewController *statusBarViewController;
 
 @property (nonatomic, strong) UIImage *snapshotImage;
 @property (nonatomic, strong) UIImage *snapshorImageHideFromView;
@@ -246,6 +247,17 @@
 @end
 
 @implementation YYPhotoGroupView
+
+- (UIViewController *)childViewControllerForStatusBarHidden {
+    return _statusBarViewController;
+}
+
+- (void)setStatusBarHidden:(BOOL)statusBarHidden {
+    if (_statusBarHidden == statusBarHidden) return;
+    _statusBarHidden = statusBarHidden;
+    UIViewController *vc = _statusBarViewController ?: self.toContainerView.viewController ?: self.viewController;
+    [vc setNeedsStatusBarAppearanceUpdate];
+}
 
 - (instancetype)initWithGroupItems:(NSArray *)groupItems {
     self = [super init];
@@ -366,7 +378,8 @@
     
     _fromView = fromView;
     _toContainerView = toContainer;
-    
+    _statusBarViewController = toContainer.viewController ?: self.viewController;
+
     NSInteger page = -1;
     for (NSUInteger i = 0; i < self.groupItems.count; i++) {
         if (fromView == ((YYPhotoGroupItem *)self.groupItems[i]).thumbView) {
@@ -402,8 +415,13 @@
     [self scrollViewDidScroll:_scrollView];
     
     [UIView setAnimationsEnabled:YES];
-    _fromNavigationBarHidden = [UIApplication sharedApplication].statusBarHidden;
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:animated ? UIStatusBarAnimationFade : UIStatusBarAnimationNone];
+    _fromNavigationBarHidden = _statusBarViewController.prefersStatusBarHidden;
+    self.statusBarHidden = YES;
+    if (animated) {
+        [UIView animateWithDuration:0.25 animations:^{
+            [_statusBarViewController setNeedsStatusBarAppearanceUpdate];
+        }];
+    }
     
     
     YYPhotoGroupCell *cell = [self cellForPage:self.currentPage];
@@ -482,8 +500,13 @@
 
 - (void)dismissAnimated:(BOOL)animated completion:(void (^)(void))completion {
     [UIView setAnimationsEnabled:YES];
-    
-    [[UIApplication sharedApplication] setStatusBarHidden:_fromNavigationBarHidden withAnimation:animated ? UIStatusBarAnimationFade : UIStatusBarAnimationNone];
+
+    self.statusBarHidden = _fromNavigationBarHidden;
+    if (animated) {
+        [UIView animateWithDuration:0.25 animations:^{
+            [_statusBarViewController setNeedsStatusBarAppearanceUpdate];
+        }];
+    }
     NSInteger currentPage = self.currentPage;
     YYPhotoGroupCell *cell = [self cellForPage:currentPage];
     YYPhotoGroupItem *item = _groupItems[currentPage];
@@ -801,8 +824,11 @@
             if (fabs(v.y) > 1000 || fabs(deltaY) > 120) {
                 [self cancelAllImageLoad];
                 _isPresented = NO;
-                [[UIApplication sharedApplication] setStatusBarHidden:_fromNavigationBarHidden withAnimation:UIStatusBarAnimationFade];
-                
+                self.statusBarHidden = _fromNavigationBarHidden;
+                [UIView animateWithDuration:0.25 animations:^{
+                    [_statusBarViewController setNeedsStatusBarAppearanceUpdate];
+                }];
+
                 BOOL moveToTop = (v.y < - 50 || (v.y < 50 && deltaY < 0));
                 CGFloat vy = fabs(v.y);
                 if (vy < 1) vy = 1;

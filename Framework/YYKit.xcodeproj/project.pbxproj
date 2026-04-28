@@ -173,7 +173,7 @@
 		D9B2620D1BEF527A0038C00A /* YYKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D9B261691BEF52730038C00A /* YYKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D9B2620F1BEF53070038C00A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9B2620E1BEF53070038C00A /* SystemConfiguration.framework */; };
 		D9B262111BEF530C0038C00A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9B262101BEF530C0038C00A /* Accelerate.framework */; };
-		D9B262131BEF53110038C00A /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9B262121BEF53110038C00A /* AssetsLibrary.framework */; };
+		D9B262131BEF53110038C00A /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9B262121BEF53110038C00A /* Photos.framework */; };
 		D9B262151BEF53150038C00A /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9B262141BEF53150038C00A /* ImageIO.framework */; };
 		D9B262171BEF531A0038C00A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9B262161BEF531A0038C00A /* QuartzCore.framework */; };
 		D9B262191BEF531E0038C00A /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9B262181BEF531E0038C00A /* CoreImage.framework */; };
@@ -355,7 +355,7 @@
 		D9B261691BEF52730038C00A /* YYKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYKit.h; sourceTree = "<group>"; };
 		D9B2620E1BEF53070038C00A /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		D9B262101BEF530C0038C00A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		D9B262121BEF53110038C00A /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		D9B262121BEF53110038C00A /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		D9B262141BEF53150038C00A /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		D9B262161BEF531A0038C00A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		D9B262181BEF531E0038C00A /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
@@ -382,7 +382,7 @@
 				D9B262191BEF531E0038C00A /* CoreImage.framework in Frameworks */,
 				D9B262171BEF531A0038C00A /* QuartzCore.framework in Frameworks */,
 				D9B262151BEF53150038C00A /* ImageIO.framework in Frameworks */,
-				D9B262131BEF53110038C00A /* AssetsLibrary.framework in Frameworks */,
+				D9B262131BEF53110038C00A /* Photos.framework in Frameworks */,
 				D9B262111BEF530C0038C00A /* Accelerate.framework in Frameworks */,
 				D9B263B51BEF65C70038C00A /* MobileCoreServices.framework in Frameworks */,
 				D9B2620F1BEF53070038C00A /* SystemConfiguration.framework in Frameworks */,
@@ -422,7 +422,7 @@
 				D9B262181BEF531E0038C00A /* CoreImage.framework */,
 				D9B262161BEF531A0038C00A /* QuartzCore.framework */,
 				D9B262141BEF53150038C00A /* ImageIO.framework */,
-				D9B262121BEF53110038C00A /* AssetsLibrary.framework */,
+				D9B262121BEF53110038C00A /* Photos.framework */,
 				D9B262101BEF530C0038C00A /* Accelerate.framework */,
 				D9B263B41BEF65C70038C00A /* MobileCoreServices.framework */,
 				D9B2620E1BEF53070038C00A /* SystemConfiguration.framework */,

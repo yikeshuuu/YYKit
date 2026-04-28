@@ -20,11 +20,11 @@
 #endif
 
 #ifdef YYDispatchQueuePool_h
-static inline dispatch_queue_t YYMemoryCacheGetReleaseQueue() {
+static inline dispatch_queue_t YYMemoryCacheGetReleaseQueue(void) {
     return YYDispatchQueueGetForQOS(NSQualityOfServiceUtility);
 }
 #else
-static inline dispatch_queue_t YYMemoryCacheGetReleaseQueue() {
+static inline dispatch_queue_t YYMemoryCacheGetReleaseQueue(void) {
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
 }
 #endif

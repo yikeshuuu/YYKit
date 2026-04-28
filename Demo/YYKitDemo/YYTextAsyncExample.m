@@ -10,6 +10,14 @@
 #import "YYKit.h"
 #import "YYFPSLabel.h"
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
+
 #define kCellHeight 34
 
 @interface YYTextAsyncExampleCell : UITableViewCell
@@ -112,20 +120,25 @@
     
     
     UIView *toolbar;
+    UIView *toolbarContent;
     if ([UIVisualEffectView class]) {
-        toolbar = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]];
+        UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]];
+        toolbar = effectView;
+        toolbarContent = effectView.contentView;
     } else {
         toolbar = [UIToolbar new];
+        toolbarContent = toolbar;
     }
     toolbar.size = CGSizeMake(kScreenWidth, 40);
-    toolbar.top = kiOS7Later ? 64 : 0;
+    toolbar.top = YYDemoTopLayoutInset(self);
     [self.view addSubview:toolbar];
+    toolbarContent.frame = toolbar.bounds;
     
     
     YYFPSLabel *fps = [YYFPSLabel new];
     fps.centerY = toolbar.height / 2;
     fps.left = 5;
-    [toolbar addSubview:fps];
+    [toolbarContent addSubview:fps];
     
     UILabel *label = [UILabel new];
     label.backgroundColor = [UIColor clearColor];
@@ -134,7 +147,7 @@
     [label sizeToFit];
     label.centerY = toolbar.height / 2;
     label.left = fps.right + 10;
-    [toolbar addSubview:label];
+    [toolbarContent addSubview:label];
     
     UISwitch *switcher = [UISwitch new];
     [switcher sizeToFit];
@@ -147,7 +160,7 @@
         if (!self) return;
         [self setAsync:switcher.isOn];
     }];
-    [toolbar addSubview:switcher];
+    [toolbarContent addSubview:switcher];
 }
 
 - (void)setAsync:(BOOL)async {

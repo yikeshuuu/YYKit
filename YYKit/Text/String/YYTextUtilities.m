@@ -11,7 +11,7 @@
 
 #import "YYTextUtilities.h"
 
-NSCharacterSet *YYTextVerticalFormRotateCharacterSet() {
+NSCharacterSet *YYTextVerticalFormRotateCharacterSet(void) {
     static NSMutableCharacterSet *set;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -54,7 +54,7 @@ NSCharacterSet *YYTextVerticalFormRotateCharacterSet() {
     return set;
 }
 
-NSCharacterSet *YYTextVerticalFormRotateAndMoveCharacterSet() {
+NSCharacterSet *YYTextVerticalFormRotateAndMoveCharacterSet(void) {
     static NSMutableCharacterSet *set;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

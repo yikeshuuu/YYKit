@@ -19,6 +19,14 @@ YYSYNTH_DUMMY_CLASS(UIView_YYAdd)
 @implementation UIView (YYAdd)
 
 - (UIImage *)snapshotImage {
+    if (@available(iOS 10.0, *)) {
+        UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
+        format.opaque = self.opaque;
+        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:self.bounds.size format:format];
+        return [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+            [self.layer renderInContext:rendererContext.CGContext];
+        }];
+    }
     UIGraphicsBeginImageContextWithOptions(self.bounds.size, self.opaque, 0);
     [self.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *snap = UIGraphicsGetImageFromCurrentImageContext();
@@ -29,6 +37,14 @@ YYSYNTH_DUMMY_CLASS(UIView_YYAdd)
 - (UIImage *)snapshotImageAfterScreenUpdates:(BOOL)afterUpdates {
     if (![self respondsToSelector:@selector(drawViewHierarchyInRect:afterScreenUpdates:)]) {
         return [self snapshotImage];
+    }
+    if (@available(iOS 10.0, *)) {
+        UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
+        format.opaque = self.opaque;
+        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:self.bounds.size format:format];
+        return [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+            [self drawViewHierarchyInRect:self.bounds afterScreenUpdates:afterUpdates];
+        }];
     }
     UIGraphicsBeginImageContextWithOptions(self.bounds.size, self.opaque, 0);
     [self drawViewHierarchyInRect:self.bounds afterScreenUpdates:afterUpdates];

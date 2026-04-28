@@ -10,6 +10,14 @@
 #import "YYKit.h"
 #import "YYTextExampleHelper.h"
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
+
 @interface YYTextEditExample () <YYTextViewDelegate, YYTextKeyboardObserver>
 @property (nonatomic, assign) YYTextView *textView;
 @property (nonatomic, strong) UIImageView *imageView;
@@ -23,21 +31,23 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
     [self initImageView];
     __weak typeof(self) _self = self;
     
     UIView *toolbar;
+    UIView *toolbarContent;
     if ([UIVisualEffectView class]) {
-        toolbar = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]];
+        UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]];
+        toolbar = effectView;
+        toolbarContent = effectView.contentView;
     } else {
         toolbar = [UIToolbar new];
+        toolbarContent = toolbar;
     }
     toolbar.size = CGSizeMake(kScreenWidth, 40);
-    toolbar.top = kiOS7Later ? 64 : 0;
+    toolbar.top = YYDemoTopLayoutInset(self);
     [self.view addSubview:toolbar];
+    toolbarContent.frame = toolbar.bounds;
     
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:@"It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the season of light, it was the season of darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us. We were all going direct to heaven, we were all going direct the other way.\n\n这是最好的时代，这是最坏的时代；这是智慧的时代，这是愚蠢的时代；这是信仰的时期，这是怀疑的时期；这是光明的季节，这是黑暗的季节；这是希望之春，这是失望之冬；人们面前有着各样事物，人们面前一无所有；人们正在直登天堂，人们正在直下地狱。"];
     text.font = [UIFont fontWithName:@"Times New Roman" size:20];
@@ -64,8 +74,6 @@
         [textView becomeFirstResponder];
     });
     
-    
-    
     /*------------------------------ Toolbar ---------------------------------*/
     UILabel *label;
     label = [UILabel new];
@@ -74,7 +82,7 @@
     label.text = @"Vertical:";
     label.size = CGSizeMake([label.text widthForFont:label.font] + 2, toolbar.height);
     label.left = 10;
-    [toolbar addSubview:label];
+    [toolbarContent addSubview:label];
     
     _verticalSwitch = [UISwitch new];
     [_verticalSwitch sizeToFit];
@@ -90,7 +98,7 @@
         _self.exclusionSwitch.enabled = !switcher.isOn;
         _self.textView.verticalForm = switcher.isOn; /// Set vertical form
     }];
-    [toolbar addSubview:_verticalSwitch];
+    [toolbarContent addSubview:_verticalSwitch];
     
     label = [UILabel new];
     label.backgroundColor = [UIColor clearColor];
@@ -98,7 +106,7 @@
     label.text = @"Debug:";
     label.size = CGSizeMake([label.text widthForFont:label.font] + 2, toolbar.height);
     label.left = _verticalSwitch.right + 5;
-    [toolbar addSubview:label];
+    [toolbarContent addSubview:label];
     
     _debugSwitch = [UISwitch new];
     [_debugSwitch sizeToFit];
@@ -109,7 +117,7 @@
     [_debugSwitch addBlockForControlEvents:UIControlEventValueChanged block:^(UISwitch *switcher) {
         [YYTextExampleHelper setDebug:switcher.isOn];
     }];
-    [toolbar addSubview:_debugSwitch];
+    [toolbarContent addSubview:_debugSwitch];
     
     label = [UILabel new];
     label.backgroundColor = [UIColor clearColor];
@@ -117,7 +125,7 @@
     label.text = @"Exclusion:";
     label.size = CGSizeMake([label.text widthForFont:label.font] + 2, toolbar.height);
     label.left = _debugSwitch.right + 5;
-    [toolbar addSubview:label];
+    [toolbarContent addSubview:label];
     
     _exclusionSwitch = [UISwitch new];
     [_exclusionSwitch sizeToFit];
@@ -127,7 +135,7 @@
     [_exclusionSwitch addBlockForControlEvents:UIControlEventValueChanged block:^(UISwitch *switcher) {
         [_self setExclusionPathEnabled:switcher.isOn];
     }];
-    [toolbar addSubview:_exclusionSwitch];
+    [toolbarContent addSubview:_exclusionSwitch];
     
     
     [[YYTextKeyboardManager defaultManager] addObserver:self];

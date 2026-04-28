@@ -60,9 +60,6 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     YYRootViewController *root = [YYRootViewController new];
     YYExampleNavController *nav = [[YYExampleNavController alloc] initWithNavigationBarClass:[YYExampleNavBar class] toolbarClass:[UIToolbar class]];
-    if ([nav respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-        nav.automaticallyAdjustsScrollViewInsets = NO;
-    }
     [nav pushViewController:root animated:NO];
     
     self.rootViewController = nav;

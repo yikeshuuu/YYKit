@@ -172,18 +172,14 @@ static int _YYTextKeyboardViewFrameObserverKey;
 }
 
 - (UIWindow *)keyboardWindow {
-    UIApplication *app = [UIApplication sharedExtensionApplication];
-    if (!app) return nil;
-    
+    NSArray<UIWindow *> *windows = [UIApplication yy_windows];
     UIWindow *window = nil;
-    for (window in app.windows) {
+    for (window in windows) {
         if ([self _getKeyboardViewFromWindow:window]) return window;
     }
-    window = app.keyWindow;
-    if ([self _getKeyboardViewFromWindow:window]) return window;
-    
+
     NSMutableArray *kbWindows = nil;
-    for (window in app.windows) {
+    for (window in windows) {
         NSString *windowName = NSStringFromClass(window.class);
         if ([self _systemVersion] < 9) {
             // UITextEffectsWindow
@@ -211,18 +207,12 @@ static int _YYTextKeyboardViewFrameObserverKey;
 }
 
 - (UIView *)keyboardView {
-    UIApplication *app = [UIApplication sharedExtensionApplication];
-    if (!app) return nil;
-    
     UIWindow *window = nil;
     UIView *view = nil;
-    for (window in app.windows) {
+    for (window in [UIApplication yy_windows]) {
         view = [self _getKeyboardViewFromWindow:window];
         if (view) return view;
     }
-    window = app.keyWindow;
-    view = [self _getKeyboardViewFromWindow:window];
-    if (view) return view;
     return nil;
 }
 
@@ -402,16 +392,18 @@ static int _YYTextKeyboardViewFrameObserverKey;
 - (void)_notifyAllObservers {
     UIApplication *app = [UIApplication sharedExtensionApplication];
     if (!app) return;
-    
+
     UIView *keyboard = self.keyboardView;
     UIWindow *window = keyboard.window;
     if (!window) {
-        window = app.keyWindow;
+        window = [UIApplication yy_keyWindowForView:keyboard];
     }
     if (!window) {
-        window = app.windows.firstObject;
+        window = [UIApplication yy_keyWindow];
     }
     
+    if (!window) return;
+
     YYTextKeyboardTransition trans = {0};
     
     // from
@@ -489,28 +481,35 @@ static int _YYTextKeyboardViewFrameObserverKey;
 - (CGRect)convertRect:(CGRect)rect toView:(UIView *)view {
     UIApplication *app = [UIApplication sharedExtensionApplication];
     if (!app) return CGRectZero;
-    
+
     if (CGRectIsNull(rect)) return rect;
     if (CGRectIsInfinite(rect)) return rect;
-    
-    UIWindow *mainWindow = app.keyWindow;
-    if (!mainWindow) mainWindow = app.windows.firstObject;
+
+    UIWindow *mainWindow = [UIApplication yy_keyWindowForView:view];
     if (!mainWindow) { // no window ?!
         if (view) {
-            [view convertRect:rect fromView:nil];
+            return [view convertRect:rect fromView:nil];
         } else {
             return rect;
         }
     }
-    
+
+    if (!view) return [mainWindow convertRect:rect toWindow:nil];
+    UIWindow *toWindow = [view isKindOfClass:[UIWindow class]] ? (id)view : view.window;
+    if (!toWindow) return [mainWindow convertRect:rect toView:view];
+    if (mainWindow.windowScene && toWindow.windowScene && mainWindow.windowScene != toWindow.windowScene) {
+        mainWindow = [UIApplication yy_keyWindowForView:view] ?: toWindow;
+    }
+    if (!mainWindow) return [view convertRect:rect fromView:nil];
+
     rect = [mainWindow convertRect:rect fromWindow:nil];
     if (!view) return [mainWindow convertRect:rect toWindow:nil];
     if (view == mainWindow) return rect;
-    
-    UIWindow *toWindow = [view isKindOfClass:[UIWindow class]] ? (id)view : view.window;
+
+    toWindow = [view isKindOfClass:[UIWindow class]] ? (id)view : view.window;
     if (!mainWindow || !toWindow) return [mainWindow convertRect:rect toView:view];
     if (mainWindow == toWindow) return [mainWindow convertRect:rect toView:view];
-    
+
     // in different window
     rect = [mainWindow convertRect:rect toView:mainWindow];
     rect = [toWindow convertRect:rect fromWindow:mainWindow];

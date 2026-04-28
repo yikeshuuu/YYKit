@@ -9,6 +9,13 @@
 #import "YYTextBindingExample.h"
 #import "YYKit.h"
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
 
 @interface YYTextExampleEmailBindingParser :NSObject <YYTextParser>
 @property (nonatomic, strong) NSRegularExpression *regex;
@@ -52,10 +59,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:@"sjobs@apple.com, apple@apple.com, banana@banana.com, pear@pear.com "];
     text.font = [UIFont systemFontOfSize:17];
     text.lineSpacing = 5;
@@ -70,7 +73,7 @@
     if (kiOS7Later) {
         textView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
     }
-    textView.contentInset = UIEdgeInsetsMake((kiOS7Later ? 64 : 0), 0, 0, 0);
+    textView.contentInset = UIEdgeInsetsMake(YYDemoTopLayoutInset(self), 0, 0, 0);
     textView.scrollIndicatorInsets = textView.contentInset;
     [self.view addSubview:textView];
     self.textView = textView;

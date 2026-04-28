@@ -84,6 +84,21 @@ NS_ASSUME_NONNULL_BEGIN
 /// Same as sharedApplication, but returns nil in App Extension.
 + (nullable UIApplication *)sharedExtensionApplication;
 
+/// Returns candidate windows for the current foreground scene.
++ (NSArray<UIWindow *> *)yy_windows;
+
+/// Returns candidate windows for the view's scene, or foreground scene fallback.
++ (NSArray<UIWindow *> *)yy_windowsForView:(nullable UIView *)view;
+
+/// Returns the best key window for the current foreground scene.
++ (nullable UIWindow *)yy_keyWindow;
+
+/// Returns the best key window for the view's scene, or foreground scene fallback.
++ (nullable UIWindow *)yy_keyWindowForView:(nullable UIView *)view;
+
+/// Returns the best root view controller for the view's scene, or foreground scene fallback.
++ (nullable UIViewController *)yy_rootViewControllerForView:(nullable UIView *)view;
+
 @end
 
 NS_ASSUME_NONNULL_END

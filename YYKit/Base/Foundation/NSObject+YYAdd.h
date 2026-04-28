@@ -119,6 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
      [view performSelectorWithArgsOnMainThread:@selector(setCenter:), waitUntilDone:NO, CGPointMake(0, 0)];
  */
 - (nullable id)performSelectorWithArgsOnMainThread:(SEL)sel waitUntilDone:(BOOL)wait, ...;
+- (nullable id)performSelectorWithArgsOnMainThread:(SEL)sel waitUntilDone:(BOOL)wait modes:(NSArray<NSString *> *)modes, ...;
 
 /**
  Invokes a method of the receiver on the specified thread using the default mode.
@@ -155,6 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
      }];
  */
 - (nullable id)performSelectorWithArgs:(SEL)sel onThread:(NSThread *)thread waitUntilDone:(BOOL)wait, ...;
+- (nullable id)performSelectorWithArgs:(SEL)sel onThread:(NSThread *)thread waitUntilDone:(BOOL)wait modes:(NSArray<NSString *> *)modes, ...;
 
 /**
  Invokes a method of the receiver on a new background thread.

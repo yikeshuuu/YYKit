@@ -9,6 +9,14 @@
 #import "YYTextMarkdownExample.h"
 #import "YYKit.h"
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
+
 @interface YYTextMarkdownExample () <YYTextViewDelegate>
 @property (nonatomic, assign) YYTextView *textView;
 @end
@@ -18,10 +26,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    
     
     NSString *text = @"#Markdown Editor\nThis is a simple markdown editor based on `YYTextView`.\n\n*********************************************\nIt\'s *italic* style.\n\nIt\'s also _italic_ style.\n\nIt\'s **bold** style.\n\nIt\'s ***italic and bold*** style.\n\nIt\'s __underline__ style.\n\nIt\'s ~~deleteline~~ style.\n\n\nHere is a link: [YYKit](https://github.com/ibireme/YYKit)\n\nHere is some code:\n\n\tif(a){\n\t\tif(b){\n\t\t\tif(c){\n\t\t\t\tprintf(\"haha\");\n\t\t\t}\n\t\t}\n\t}\n";
     
@@ -39,7 +43,7 @@
         textView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
     }
     textView.backgroundColor = [UIColor colorWithWhite:0.134 alpha:1.000];
-    textView.contentInset = UIEdgeInsetsMake((kiOS7Later ? 64 : 0), 0, 0, 0);
+    textView.contentInset = UIEdgeInsetsMake(YYDemoTopLayoutInset(self), 0, 0, 0);
     textView.scrollIndicatorInsets = textView.contentInset;
     textView.selectedRange = NSMakeRange(text.length, 0);
     [self.view addSubview:textView];

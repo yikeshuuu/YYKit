@@ -284,14 +284,14 @@ static inline dispatch_time_t dispatch_walltime_date(NSDate *date) {
 /**
  Whether in main queue/thread.
  */
-static inline bool dispatch_is_main_queue() {
+static inline bool dispatch_is_main_queue(void) {
     return pthread_main_np() != 0;
 }
 
 /**
  Submits a block for asynchronous execution on a main queue and returns immediately.
  */
-static inline void dispatch_async_on_main_queue(void (^block)()) {
+static inline void dispatch_async_on_main_queue(void (^block)(void)) {
     if (pthread_main_np()) {
         block();
     } else {
@@ -302,7 +302,7 @@ static inline void dispatch_async_on_main_queue(void (^block)()) {
 /**
  Submits a block for execution on a main queue and waits until the block completes.
  */
-static inline void dispatch_sync_on_main_queue(void (^block)()) {
+static inline void dispatch_sync_on_main_queue(void (^block)(void)) {
     if (pthread_main_np()) {
         block();
     } else {

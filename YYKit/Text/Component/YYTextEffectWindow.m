@@ -51,11 +51,12 @@
 
 // stop self from becoming the KeyWindow
 - (void)becomeKeyWindow {
-    [[[UIApplication sharedExtensionApplication].delegate window] makeKeyWindow];
+    UIWindow *window = [UIApplication yy_keyWindowForView:self];
+    if (window && window != self) [window makeKeyWindow];
 }
 
 - (UIViewController *)rootViewController {
-    for (UIWindow *window in [[UIApplication sharedExtensionApplication] windows]) {
+    for (UIWindow *window in [UIApplication yy_windowsForView:self]) {
         if (self == window) continue;
         if (window.hidden) continue;
         UIViewController *topViewController = window.rootViewController;
@@ -71,15 +72,14 @@
 
 // Bring self to front
 - (void)_updateWindowLevel {
-    UIApplication *app = [UIApplication sharedExtensionApplication];
-    if (!app) return;
-    
-    UIWindow *top = app.windows.lastObject;
-    UIWindow *key = app.keyWindow;
-    if (key && key.windowLevel > top.windowLevel) top = key;
-    if (top == self) return;
+    NSArray<UIWindow *> *windows = [UIApplication yy_windowsForView:self];
+    UIWindow *top = nil;
+    for (UIWindow *window in windows) {
+        if (window == self || window.hidden) continue;
+        if (!top || window.windowLevel > top.windowLevel) top = window;
+    }
+    if (!top || top == self) return;
     self.windowLevel = top.windowLevel + 1;
-
 }
 
 - (YYTextDirection)_keyboardDirection {
@@ -247,12 +247,22 @@
             static dispatch_once_t onceToken;
             dispatch_once(&onceToken, ^{
                 CGRect rect = CGRectMake(0, 0, mag.width, mag.height);
-                UIGraphicsBeginImageContextWithOptions(rect.size, NO, 0);
-                CGContextRef context = UIGraphicsGetCurrentContext();
-                [[UIColor colorWithWhite:1 alpha:0.8] set];
-                CGContextFillRect(context, rect);
-                placeholder = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
+                if (@available(iOS 10.0, *)) {
+                    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
+                    format.opaque = NO;
+                    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:rect.size format:format];
+                    placeholder = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+                        [[UIColor colorWithWhite:1 alpha:0.8] set];
+                        CGContextFillRect(rendererContext.CGContext, rect);
+                    }];
+                } else {
+                    UIGraphicsBeginImageContextWithOptions(rect.size, NO, 0);
+                    CGContextRef context = UIGraphicsGetCurrentContext();
+                    [[UIColor colorWithWhite:1 alpha:0.8] set];
+                    CGContextFillRect(context, rect);
+                    placeholder = UIGraphicsGetImageFromCurrentImageContext();
+                    UIGraphicsEndImageContext();
+                }
             });
             mag.captureFadeAnimation = YES;
             mag.snapshot = placeholder;
@@ -261,36 +271,47 @@
         return rotation;
     }
     
-    UIGraphicsBeginImageContextWithOptions(captureRect.size, NO, 0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    if (!context) return rotation;
-    
-    CGPoint tp = CGPointMake(captureRect.size.width / 2, captureRect.size.height / 2);
-    tp = CGPointApplyAffineTransform(tp, CGAffineTransformMakeRotation(rotation));
-    CGContextRotateCTM(context, -rotation);
-    CGContextTranslateCTM(context, tp.x - captureCenter.x, tp.y - captureCenter.y);
-    
-    NSMutableArray *windows = app.windows.mutableCopy;
-    UIWindow *keyWindow = app.keyWindow;
-    if (![windows containsObject:keyWindow]) [windows addObject:keyWindow];
+    NSMutableArray *windows = [[UIApplication yy_windowsForView:hostView] mutableCopy];
+    UIWindow *keyWindow = [UIApplication yy_keyWindowForView:hostView];
+    if (keyWindow && ![windows containsObject:keyWindow]) [windows addObject:keyWindow];
+    if (![windows containsObject:hostWindow]) [windows addObject:hostWindow];
     [windows sortUsingComparator:^NSComparisonResult(UIWindow *w1, UIWindow *w2) {
         if (w1.windowLevel < w2.windowLevel) return NSOrderedAscending;
         else if (w1.windowLevel > w2.windowLevel) return NSOrderedDescending;
         return NSOrderedSame;
     }];
     UIScreen *mainScreen = [UIScreen mainScreen];
-    for (UIWindow *window in windows) {
-        if (window.hidden || window.alpha <= 0.01) continue;
-        if (window.screen != mainScreen) continue;
-        if ([window isKindOfClass:self.class]) break; //don't capture window above self
-        CGContextSaveGState(context);
-        CGContextConcatCTM(context, YYCGAffineTransformGetFromViews(window, self));
-        [window.layer renderInContext:context]; //render
-        //[window drawViewHierarchyInRect:window.bounds afterScreenUpdates:NO]; //slower when capture whole window
-        CGContextRestoreGState(context);
+    void (^drawCapture)(CGContextRef) = ^(CGContextRef context) {
+        CGPoint tp = CGPointMake(captureRect.size.width / 2, captureRect.size.height / 2);
+        tp = CGPointApplyAffineTransform(tp, CGAffineTransformMakeRotation(rotation));
+        CGContextRotateCTM(context, -rotation);
+        CGContextTranslateCTM(context, tp.x - captureCenter.x, tp.y - captureCenter.y);
+        for (UIWindow *window in windows) {
+            if (window.hidden || window.alpha <= 0.01) continue;
+            if (window.screen != mainScreen) continue;
+            if ([window isKindOfClass:self.class]) break;
+            CGContextSaveGState(context);
+            CGContextConcatCTM(context, YYCGAffineTransformGetFromViews(window, self));
+            [window.layer renderInContext:context];
+            CGContextRestoreGState(context);
+        }
+    };
+    UIImage *image;
+    if (@available(iOS 10.0, *)) {
+        UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
+        format.opaque = NO;
+        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:captureRect.size format:format];
+        image = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+            drawCapture(rendererContext.CGContext);
+        }];
+    } else {
+        UIGraphicsBeginImageContextWithOptions(captureRect.size, NO, 0);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        if (!context) return rotation;
+        drawCapture(context);
+        image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
     }
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
     
     if (mag.snapshot.size.width == 1) {
         mag.captureFadeAnimation = YES;

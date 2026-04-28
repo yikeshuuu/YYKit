@@ -21,7 +21,7 @@
 #endif
 
 
-static inline dispatch_queue_t YYImageCacheIOQueue() {
+static inline dispatch_queue_t YYImageCacheIOQueue(void) {
 #ifdef YYDispatchQueuePool_h
     return YYDispatchQueueGetForQOS(NSQualityOfServiceDefault);
 #else
@@ -29,7 +29,7 @@ static inline dispatch_queue_t YYImageCacheIOQueue() {
 #endif
 }
 
-static inline dispatch_queue_t YYImageCacheDecodeQueue() {
+static inline dispatch_queue_t YYImageCacheDecodeQueue(void) {
 #ifdef YYDispatchQueuePool_h
     return YYDispatchQueueGetForQOS(NSQualityOfServiceUtility);
 #else

@@ -10,6 +10,14 @@
 #import "YYKit.h"
 #import "YYTextExampleHelper.h"
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
+
 @interface YYTextTagExample () <YYTextViewDelegate>
 @property (nonatomic, assign) YYTextView *textView;
 @end
@@ -19,10 +27,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    
     NSMutableAttributedString *text = [NSMutableAttributedString new];
     NSArray *tags = @[@"◉red", @"◉orange", @"◉yellow", @"◉green", @"◉blue", @"◉purple", @"◉gray"];
     NSArray *tagStrokeColors = @[
@@ -75,7 +79,7 @@
     YYTextView *textView = [YYTextView new];
     textView.attributedText = text;
     textView.size = self.view.size;
-    textView.textContainerInset = UIEdgeInsetsMake(10 + (kiOS7Later ? 64 : 0), 10, 10, 10);
+    textView.textContainerInset = UIEdgeInsetsMake(10 + YYDemoTopLayoutInset(self), 10, 10, 10);
     textView.allowsCopyAttributedString = YES;
     textView.allowsPasteAttributedString = YES;
     textView.delegate = self;

@@ -22,6 +22,7 @@
 @property (nonatomic, readonly) NSArray *groupItems; ///< Array<YYPhotoGroupItem>
 @property (nonatomic, readonly) NSInteger currentPage;
 @property (nonatomic, assign) BOOL blurEffectBackground; ///< Default is YES
+@property (nonatomic, assign, getter=isStatusBarHidden) BOOL statusBarHidden;
 
 
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;

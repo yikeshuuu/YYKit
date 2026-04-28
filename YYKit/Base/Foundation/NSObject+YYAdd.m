@@ -24,46 +24,70 @@ YYSYNTH_DUMMY_CLASS(NSObject_YYAdd)
  Do not use it if you have performance issues.
  */
 
-#define INIT_INV(_last_arg_, _return_) \
+#define INIT_INV(_return_) \
 NSMethodSignature * sig = [self methodSignatureForSelector:sel]; \
 if (!sig) { [self doesNotRecognizeSelector:sel]; return _return_; } \
 NSInvocation *inv = [NSInvocation invocationWithMethodSignature:sig]; \
 if (!inv) { [self doesNotRecognizeSelector:sel]; return _return_; } \
 [inv setTarget:self]; \
-[inv setSelector:sel]; \
-va_list args; \
-va_start(args, _last_arg_); \
-[NSObject setInv:inv withSig:sig andArgs:args]; \
-va_end(args);
+[inv setSelector:sel];
 
 - (id)performSelectorWithArgs:(SEL)sel, ...{
-    INIT_INV(sel, nil);
+    INIT_INV(nil);
+    va_list args;
+    va_start(args, sel);
+    [NSObject setInv:inv withSig:sig andArgs:args];
+    va_end(args);
     [inv invoke];
     return [NSObject getReturnFromInv:inv withSig:sig];
 }
 
 - (void)performSelectorWithArgs:(SEL)sel afterDelay:(NSTimeInterval)delay, ...{
-    INIT_INV(delay, );
+    INIT_INV();
+    va_list args;
+    va_start(args, delay);
+    [NSObject setInv:inv withSig:sig andArgs:args];
+    va_end(args);
     [inv retainArguments];
     [inv performSelector:@selector(invoke) withObject:nil afterDelay:delay];
 }
 
 - (id)performSelectorWithArgsOnMainThread:(SEL)sel waitUntilDone:(BOOL)wait, ...{
-    INIT_INV(wait, nil);
+    return [self performSelectorWithArgsOnMainThread:sel waitUntilDone:wait modes:@[NSDefaultRunLoopMode]];
+}
+
+- (id)performSelectorWithArgsOnMainThread:(SEL)sel waitUntilDone:(BOOL)wait modes:(NSArray<NSString *> *)modes, ...{
+    INIT_INV(nil);
+    va_list args;
+    va_start(args, modes);
+    [NSObject setInv:inv withSig:sig andArgs:args];
+    va_end(args);
     if (!wait) [inv retainArguments];
-    [inv performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:wait];
+    [inv performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:wait modes:modes];
     return wait ? [NSObject getReturnFromInv:inv withSig:sig] : nil;
 }
 
 - (id)performSelectorWithArgs:(SEL)sel onThread:(NSThread *)thr waitUntilDone:(BOOL)wait, ...{
-    INIT_INV(wait, nil);
+    return [self performSelectorWithArgs:sel onThread:thr waitUntilDone:wait modes:@[NSDefaultRunLoopMode]];
+}
+
+- (id)performSelectorWithArgs:(SEL)sel onThread:(NSThread *)thr waitUntilDone:(BOOL)wait modes:(NSArray<NSString *> *)modes, ...{
+    INIT_INV(nil);
+    va_list args;
+    va_start(args, modes);
+    [NSObject setInv:inv withSig:sig andArgs:args];
+    va_end(args);
     if (!wait) [inv retainArguments];
-    [inv performSelector:@selector(invoke) onThread:thr withObject:nil waitUntilDone:wait];
+    [inv performSelector:@selector(invoke) onThread:thr withObject:nil waitUntilDone:wait modes:modes];
     return wait ? [NSObject getReturnFromInv:inv withSig:sig] : nil;
 }
 
 - (void)performSelectorWithArgsInBackground:(SEL)sel, ...{
-    INIT_INV(sel, );
+    INIT_INV();
+    va_list args;
+    va_start(args, sel);
+    [NSObject setInv:inv withSig:sig andArgs:args];
+    va_end(args);
     [inv retainArguments];
     [inv performSelectorInBackground:@selector(invoke) withObject:nil];
 }

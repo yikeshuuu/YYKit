@@ -236,4 +236,62 @@ YYSYNTH_DYNAMIC_PROPERTY_OBJECT(networkActivityInfo, setNetworkActivityInfo, RET
 #pragma clang diagnostic pop
 }
 
++ (NSArray<UIWindow *> *)yy_windows {
+    UIApplication *app = [self sharedExtensionApplication];
+    if (!app) return @[];
+    if (@available(iOS 13.0, *)) {
+        NSMutableArray<UIWindow *> *activeWindows = [NSMutableArray new];
+        NSMutableArray<UIWindow *> *inactiveWindows = [NSMutableArray new];
+        for (UIScene *scene in app.connectedScenes) {
+            if (![scene isKindOfClass:[UIWindowScene class]]) continue;
+            UIWindowScene *windowScene = (UIWindowScene *)scene;
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                [activeWindows addObjectsFromArray:windowScene.windows];
+            } else if (scene.activationState == UISceneActivationStateForegroundInactive) {
+                [inactiveWindows addObjectsFromArray:windowScene.windows];
+            }
+        }
+        return activeWindows.count ? activeWindows : inactiveWindows;
+    }
+    return app.windows ?: @[];
+}
+
++ (NSArray<UIWindow *> *)yy_windowsForView:(UIView *)view {
+    UIApplication *app = [self sharedExtensionApplication];
+    if (!app) return @[];
+    UIWindow *window = [view isKindOfClass:[UIWindow class]] ? (UIWindow *)view : view.window;
+    if (@available(iOS 13.0, *)) {
+        UIWindowScene *windowScene = window.windowScene;
+        if (windowScene) return windowScene.windows ?: @[];
+    }
+    return [self yy_windows];
+}
+
++ (UIWindow *)yy_keyWindow {
+    NSArray<UIWindow *> *windows = [self yy_windows];
+    for (UIWindow *window in windows) {
+        if (window.isKeyWindow) return window;
+    }
+    for (UIWindow *window in windows) {
+        if (!window.hidden && window.alpha > 0 && window.windowLevel == UIWindowLevelNormal) return window;
+    }
+    return windows.firstObject;
+}
+
++ (UIWindow *)yy_keyWindowForView:(UIView *)view {
+    NSArray<UIWindow *> *windows = [self yy_windowsForView:view];
+    for (UIWindow *window in windows) {
+        if (window.isKeyWindow) return window;
+    }
+    for (UIWindow *window in windows) {
+        if (!window.hidden && window.alpha > 0 && window.windowLevel == UIWindowLevelNormal) return window;
+    }
+    return windows.firstObject ?: [self yy_keyWindow];
+}
+
++ (UIViewController *)yy_rootViewControllerForView:(UIView *)view {
+    UIWindow *window = [self yy_keyWindowForView:view];
+    return window.rootViewController;
+}
+
 @end

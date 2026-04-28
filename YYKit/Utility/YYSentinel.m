@@ -10,7 +10,7 @@
 //
 
 #import "YYSentinel.h"
-#import <libkern/OSAtomic.h>
+#import <stdatomic.h>
 
 @implementation YYSentinel {
     int32_t _value;
@@ -21,7 +21,7 @@
 }
 
 - (int32_t)increase {
-    return OSAtomicIncrement32(&_value);
+    return atomic_fetch_add_explicit((_Atomic int32_t *)&_value, 1, memory_order_relaxed) + 1;
 }
 
 @end

@@ -31,7 +31,7 @@ static void PoolStackReleaseCallBack(CFAllocatorRef allocator, const void *value
 }
 
 
-static inline void YYAutoreleasePoolPush() {
+static inline void YYAutoreleasePoolPush(void) {
     NSMutableDictionary *dic =  [NSThread currentThread].threadDictionary;
     NSMutableArray *poolStack = dic[YYNSThreadAutoleasePoolStackKey];
     
@@ -51,7 +51,7 @@ static inline void YYAutoreleasePoolPush() {
     [poolStack addObject:pool]; // push
 }
 
-static inline void YYAutoreleasePoolPop() {
+static inline void YYAutoreleasePoolPop(void) {
     NSMutableDictionary *dic =  [NSThread currentThread].threadDictionary;
     NSMutableArray *poolStack = dic[YYNSThreadAutoleasePoolStackKey];
     [poolStack removeLastObject]; // pop
@@ -73,7 +73,7 @@ static void YYRunLoopAutoreleasePoolObserverCallBack(CFRunLoopObserverRef observ
     }
 }
 
-static void YYRunloopAutoreleasePoolSetup() {
+static void YYRunloopAutoreleasePoolSetup(void) {
     CFRunLoopRef runloop = CFRunLoopGetCurrent();
 
     CFRunLoopObserverRef pushObserver;

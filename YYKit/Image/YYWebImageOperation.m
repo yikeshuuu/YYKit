@@ -20,7 +20,7 @@
 #if __has_include("YYDispatchQueuePool.h")
 #import "YYDispatchQueuePool.h"
 #else
-#import <libkern/OSAtomic.h>
+#import <stdatomic.h>
 #endif
 
 #define MIN_PROGRESSIVE_TIME_INTERVAL 0.2
@@ -42,7 +42,7 @@ static BOOL YYCGImageLastPixelFilled(CGImageRef image) {
 }
 
 /// Returns JPEG SOS (Start Of Scan) Marker
-static NSData *JPEGSOSMarker() {
+static NSData *JPEGSOSMarker(void) {
     // "Start Of Scan" Marker
     static NSData *marker = nil;
     static dispatch_once_t onceToken;
@@ -57,7 +57,7 @@ static NSData *JPEGSOSMarker() {
 static NSMutableSet *URLBlacklist;
 static dispatch_semaphore_t URLBlacklistLock;
 
-static void URLBlacklistInit() {
+static void URLBlacklistInit(void) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         URLBlacklist = [NSMutableSet new];
@@ -161,7 +161,7 @@ static void URLInBlackListAdd(NSURL *url) {
             }
         }
     });
-    int32_t cur = OSAtomicIncrement32(&counter);
+    int32_t cur = atomic_fetch_add_explicit((_Atomic int32_t *)&counter, 1, memory_order_relaxed) + 1;
     if (cur < 0) cur = -cur;
     return queues[(cur) % queueCount];
     #undef MAX_QUEUE_COUNT
@@ -303,7 +303,10 @@ static void URLInBlackListAdd(NSURL *url) {
         // request image from web
         [_lock lock];
         if (![self isCancelled]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             _connection = [[NSURLConnection alloc] initWithRequest:_request delegate:[YYWeakProxy proxyWithTarget:self]];
+#pragma clang diagnostic pop
             if (![_request.URL isFileURL] && (_options & YYWebImageOptionShowNetworkActivity)) {
                 [[UIApplication sharedExtensionApplication] incrementNetworkActivityCount];
             }

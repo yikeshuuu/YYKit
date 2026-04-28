@@ -193,7 +193,7 @@ static uint32_t CalcTableCheckSum(const uint32_t *table, uint32_t numberOfBytesI
     
     for (CFIndex index = 0; index < tableCount; index++) {
         size_t tableSize = 0;
-        uint32_t aTag = (uint32_t)CFArrayGetValueAtIndex(tags, index);
+        uint32_t aTag = (uint32_t)(uintptr_t)CFArrayGetValueAtIndex(tags, index);
         if (aTag == kCTFontTableCFF && !containsCFFTable) {
             containsCFFTable = YES;
         }
@@ -240,17 +240,17 @@ static uint32_t CalcTableCheckSum(const uint32_t *table, uint32_t numberOfBytesI
     dataPtr += sizeof(TableEntry) * tableCount;
     
     for (int index = 0; index < tableCount; ++index) {
-        uint32_t aTag = (uint32_t)CFArrayGetValueAtIndex(tags, index);
+        uint32_t aTag = (uint32_t)(uintptr_t)CFArrayGetValueAtIndex(tags, index);
         CFDataRef tableDataRef = CGFontCopyTableForTag(cgFont, aTag);
         size_t tableSize = CFDataGetLength(tableDataRef);
-        
+
         memcpy(dataPtr, CFDataGetBytePtr(tableDataRef), tableSize);
-        
+
         entry->fTag = CFSwapInt32HostToBig((uint32_t)aTag);
         entry->fCheckSum = CFSwapInt32HostToBig(CalcTableCheckSum((uint32_t *)dataPtr, (uint32_t)tableSize));
-        
-        uint32_t offset = (uint32_t)dataPtr - (uint32_t)dataStart;
-        entry->fOffset = CFSwapInt32HostToBig((uint32_t)offset);
+
+        uint32_t offset = (uint32_t)(dataPtr - dataStart);
+        entry->fOffset = CFSwapInt32HostToBig(offset);
         entry->fLength = CFSwapInt32HostToBig((uint32_t)tableSize);
         dataPtr += (tableSize + 3) & ~3;
         ++entry;

@@ -57,7 +57,7 @@
 		D94D6D121BA323DA00852804 /* YYSimpleWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D6D111BA323DA00852804 /* YYSimpleWebViewController.m */; };
 		D95340A21BA47D38004FDE84 /* YYTextCopyPasteExample.m in Sources */ = {isa = PBXBuildFile; fileRef = D95340A11BA47D38004FDE84 /* YYTextCopyPasteExample.m */; };
 		D95340A51BA47D6E004FDE84 /* YYTextUndoRedoExample.m in Sources */ = {isa = PBXBuildFile; fileRef = D95340A41BA47D6E004FDE84 /* YYTextUndoRedoExample.m */; };
-		D96E58E81B7F885D004B8B45 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D96E58E71B7F885D004B8B45 /* AssetsLibrary.framework */; };
+		D96E58E81B7F885D004B8B45 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D96E58E71B7F885D004B8B45 /* Photos.framework */; };
 		D9700CC91BC680A000F878A4 /* YYPhotoGroupView.m in Sources */ = {isa = PBXBuildFile; fileRef = D9700CC81BC680A000F878A4 /* YYPhotoGroupView.m */; };
 		D9700D921BC7C16900F878A4 /* weibo_6.json in Resources */ = {isa = PBXBuildFile; fileRef = D9700D8A1BC7C16900F878A4 /* weibo_6.json */; };
 		D9700D931BC7C16900F878A4 /* weibo_2.json in Resources */ = {isa = PBXBuildFile; fileRef = D9700D8B1BC7C16900F878A4 /* weibo_2.json */; };
@@ -278,7 +278,7 @@
 		D95340A11BA47D38004FDE84 /* YYTextCopyPasteExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextCopyPasteExample.m; sourceTree = "<group>"; };
 		D95340A31BA47D6E004FDE84 /* YYTextUndoRedoExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTextUndoRedoExample.h; sourceTree = "<group>"; };
 		D95340A41BA47D6E004FDE84 /* YYTextUndoRedoExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextUndoRedoExample.m; sourceTree = "<group>"; };
-		D96E58E71B7F885D004B8B45 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		D96E58E71B7F885D004B8B45 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		D9700CC71BC680A000F878A4 /* YYPhotoGroupView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYPhotoGroupView.h; sourceTree = "<group>"; };
 		D9700CC81BC680A000F878A4 /* YYPhotoGroupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYPhotoGroupView.m; sourceTree = "<group>"; };
 		D9700D8A1BC7C16900F878A4 /* weibo_6.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = weibo_6.json; sourceTree = "<group>"; };
@@ -530,7 +530,7 @@
 				D974851E19CAB39C00F46DE1 /* CoreImage.framework in Frameworks */,
 				D974851A19CAB39100F46DE1 /* QuartzCore.framework in Frameworks */,
 				D9BB668B1B73365700F33A46 /* ImageIO.framework in Frameworks */,
-				D96E58E81B7F885D004B8B45 /* AssetsLibrary.framework in Frameworks */,
+				D96E58E81B7F885D004B8B45 /* Photos.framework in Frameworks */,
 				D9C786461AB7C6E9001317AD /* Security.framework in Frameworks */,
 				D9C786401AB7C69E001317AD /* Accelerate.framework in Frameworks */,
 				D9B263B91BEF66010038C00A /* MobileCoreServices.framework in Frameworks */,
@@ -826,7 +826,7 @@
 				D9700D9D1BC7D44B00F878A4 /* libsqlite3.tbd */,
 				D9700D9B1BC7D44500F878A4 /* libz.tbd */,
 				D9B263B81BEF66010038C00A /* MobileCoreServices.framework */,
-				D96E58E71B7F885D004B8B45 /* AssetsLibrary.framework */,
+				D96E58E71B7F885D004B8B45 /* Photos.framework */,
 				D9C786451AB7C6E9001317AD /* Security.framework */,
 				D9C786431AB7C6D8001317AD /* SystemConfiguration.framework */,
 				D9C786411AB7C6BC001317AD /* ImageIO.framework */,

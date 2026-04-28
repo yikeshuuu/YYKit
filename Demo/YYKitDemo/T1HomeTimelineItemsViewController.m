@@ -14,6 +14,14 @@
 #import "YYPhotoGroupView.h"
 #import "YYSimpleWebViewController.h"
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
+
 @interface T1HomeTimelineItemsViewController() <UITableViewDelegate, UITableViewDataSource, T1StatusCellDelegate>
 @property (nonatomic, strong) NSMutableArray *layouts;
 @property (nonatomic, strong) UITableView *tableView;
@@ -39,12 +47,8 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor colorWithWhite:1.000 alpha:0.919];
     
-    if ([self respondsToSelector:@selector( setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    
     _tableView.frame = self.view.bounds;
-    _tableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    _tableView.contentInset = UIEdgeInsetsMake(YYDemoTopLayoutInset(self), 0, 0, 0);
     _tableView.scrollIndicatorInsets = _tableView.contentInset;
     _tableView.backgroundColor = [UIColor clearColor];
     _tableView.backgroundView.backgroundColor = [UIColor clearColor];

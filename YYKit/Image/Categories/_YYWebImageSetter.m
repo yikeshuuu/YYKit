@@ -11,7 +11,7 @@
 
 #import "_YYWebImageSetter.h"
 #import "YYWebImageOperation.h"
-#import <libkern/OSAtomic.h>
+#import <stdatomic.h>
 
 NSString *const _YYWebImageFadeAnimationKey = @"YYWebImageFade";
 const NSTimeInterval _YYWebImageFadeTime = 0.2;
@@ -39,7 +39,7 @@ const NSTimeInterval _YYWebImageProgressiveFadeTime = 0.4;
 }
 
 - (void)dealloc {
-    OSAtomicIncrement32(&_sentinel);
+    atomic_fetch_add_explicit((_Atomic int32_t *)&_sentinel, 1, memory_order_relaxed);
     [_operation cancel];
 }
 
@@ -65,7 +65,7 @@ const NSTimeInterval _YYWebImageProgressiveFadeTime = 0.4;
     if (sentinel == _sentinel) {
         if (_operation) [_operation cancel];
         _operation = operation;
-        sentinel = OSAtomicIncrement32(&_sentinel);
+        sentinel = atomic_fetch_add_explicit((_Atomic int32_t *)&_sentinel, 1, memory_order_relaxed) + 1;
     } else {
         [operation cancel];
     }
@@ -85,7 +85,7 @@ const NSTimeInterval _YYWebImageProgressiveFadeTime = 0.4;
         _operation = nil;
     }
     _imageURL = imageURL;
-    sentinel = OSAtomicIncrement32(&_sentinel);
+    sentinel = atomic_fetch_add_explicit((_Atomic int32_t *)&_sentinel, 1, memory_order_relaxed) + 1;
     dispatch_semaphore_signal(_lock);
     return sentinel;
 }

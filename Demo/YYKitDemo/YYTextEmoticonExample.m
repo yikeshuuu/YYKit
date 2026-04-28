@@ -9,6 +9,14 @@
 #import "YYTextEmoticonExample.h"
 #import "YYKit.h"
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
+
 @interface YYTextEmoticonExample () <YYTextViewDelegate>
 @property (nonatomic, strong) YYTextView *textView;
 @end
@@ -18,10 +26,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    
     NSMutableDictionary *mapper = [NSMutableDictionary new];
     mapper[@":smile:"] = [self imageWithName:@"002"];
     mapper[@":cool:"] = [self imageWithName:@"013"];
@@ -48,7 +52,7 @@
     if (kiOS7Later) {
         textView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
     }
-    textView.contentInset = UIEdgeInsetsMake((kiOS7Later ? 64 : 0), 0, 0, 0);
+    textView.contentInset = UIEdgeInsetsMake(YYDemoTopLayoutInset(self), 0, 0, 0);
     textView.scrollIndicatorInsets = textView.contentInset;
     [self.view addSubview:textView];
     self.textView = textView;

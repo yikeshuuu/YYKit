@@ -17,6 +17,13 @@
 #import "YYPhotoGroupView.h"
 #import "YYFPSLabel.h"
 
+static CGFloat YYDemoTopLayoutInset(UIViewController *vc) {
+    if (@available(iOS 11.0, *)) return vc.view.safeAreaInsets.top;
+    CGFloat inset = 0;
+    if (!vc.navigationController.navigationBarHidden) inset += vc.navigationController.navigationBar.height;
+    inset += [UIApplication sharedApplication].statusBarFrame.size.height;
+    return inset;
+}
 
 @interface WBStatusTimelineViewController () <UITableViewDelegate, UITableViewDataSource, WBStatusCellDelegate>
 @property (nonatomic, strong) UITableView *tableView;
@@ -37,16 +44,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if ([self respondsToSelector:@selector( setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    
     UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithImage:[WBStatusHelper imageNamed:@"toolbar_compose_highlighted"] style:UIBarButtonItemStylePlain target:self action:@selector(sendStatus)];
     rightItem.tintColor = UIColorHex(fd8224);
     self.navigationItem.rightBarButtonItem = rightItem;
     
     _tableView.frame = self.view.bounds;
-    _tableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    _tableView.contentInset = UIEdgeInsetsMake(YYDemoTopLayoutInset(self), 0, 0, 0);
     _tableView.scrollIndicatorInsets = _tableView.contentInset;
     _tableView.backgroundColor = [UIColor clearColor];
     _tableView.backgroundView.backgroundColor = [UIColor clearColor];

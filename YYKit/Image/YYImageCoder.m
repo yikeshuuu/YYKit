@@ -15,7 +15,7 @@
 #import <Accelerate/Accelerate.h>
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/MobileCoreServices.h>
-#import <AssetsLibrary/AssetsLibrary.h>
+#import <Photos/Photos.h>
 #import <objc/runtime.h>
 #import <pthread.h>
 #import <zlib.h>
@@ -640,7 +640,7 @@ static inline CGFloat YYImageDegreesToRadians(CGFloat degrees) {
     return degrees * M_PI / 180;
 }
 
-CGColorSpaceRef YYCGColorSpaceGetDeviceRGB() {
+CGColorSpaceRef YYCGColorSpaceGetDeviceRGB(void) {
     static CGColorSpaceRef space;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -649,7 +649,7 @@ CGColorSpaceRef YYCGColorSpaceGetDeviceRGB() {
     return space;
 }
 
-CGColorSpaceRef YYCGColorSpaceGetDeviceGray() {
+CGColorSpaceRef YYCGColorSpaceGetDeviceGray(void) {
     static CGColorSpaceRef space;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -1229,7 +1229,7 @@ CFDataRef YYCGImageCreateEncodedData(CGImageRef imageRef, YYImageType type, CGFl
 
 #if YYIMAGE_WEBP_ENABLED
 
-BOOL YYImageWebPAvailable() {
+BOOL YYImageWebPAvailable(void) {
     return YES;
 }
 
@@ -1436,7 +1436,7 @@ fail:
 
 #else
 
-BOOL YYImageWebPAvailable() {
+BOOL YYImageWebPAvailable(void) {
     return NO;
 }
 
@@ -2788,8 +2788,7 @@ CGImageRef YYCGImageCreateWithWebPData(CFDataRef webpData,
 - (void)saveToAlbumWithCompletionBlock:(void(^)(NSURL *assetURL, NSError *error))completionBlock {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSData *data = [self _imageDataRepresentationForSystem:YES];
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeImageDataToSavedPhotosAlbum:data metadata:nil completionBlock:^(NSURL *assetURL, NSError *error){
+        void (^callCompletion)(NSURL *, NSError *) = ^(NSURL *assetURL, NSError *error) {
             if (!completionBlock) return;
             if (pthread_main_np()) {
                 completionBlock(assetURL, error);
@@ -2798,7 +2797,37 @@ CGImageRef YYCGImageCreateWithWebPData(CFDataRef webpData,
                     completionBlock(assetURL, error);
                 });
             }
-        }];
+        };
+
+        if (@available(iOS 9.0, *)) {
+            __block NSString *localIdentifier = nil;
+            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+                [request addResourceWithType:PHAssetResourceTypePhoto data:data options:nil];
+                localIdentifier = request.placeholderForCreatedAsset.localIdentifier;
+            } completionHandler:^(BOOL success, NSError * _Nullable error) {
+                NSURL *assetURL = nil;
+                if (success && localIdentifier.length) {
+                    assetURL = [NSURL URLWithString:[@"ph://" stringByAppendingString:localIdentifier]];
+                }
+                callCompletion(assetURL, error);
+            }];
+        } else if (@available(iOS 8.0, *)) {
+            __block NSString *localIdentifier = nil;
+            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:[UIImage imageWithData:data scale:self.scale ?: 1]];
+                localIdentifier = request.placeholderForCreatedAsset.localIdentifier;
+            } completionHandler:^(BOOL success, NSError * _Nullable error) {
+                NSURL *assetURL = nil;
+                if (success && localIdentifier.length) {
+                    assetURL = [NSURL URLWithString:[@"ph://" stringByAppendingString:localIdentifier]];
+                }
+                callCompletion(assetURL, error);
+            }];
+        } else {
+            NSError *error = [NSError errorWithDomain:@"com.ibireme.YYKit.image" code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Saving to the photo library requires iOS 8.0 or later."}];
+            callCompletion(nil, error);
+        }
     });
 }
 
