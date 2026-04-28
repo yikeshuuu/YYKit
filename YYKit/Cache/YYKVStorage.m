@@ -103,32 +103,19 @@ static NSString *const kTrashDirectoryName = @"trash";
 
 - (BOOL)_dbClose {
     if (!_db) return YES;
-    
-    int  result = 0;
-    BOOL retry = NO;
-    BOOL stmtFinalized = NO;
-    
+
+    sqlite3_stmt *stmt;
+    while ((stmt = sqlite3_next_stmt(_db, NULL)) != NULL) {
+        sqlite3_finalize(stmt);
+    }
+
+    int result = sqlite3_close_v2(_db);
+    if (result != SQLITE_OK && _errorLogsEnabled) {
+        NSLog(@"%s line:%d sqlite close failed (%d).", __FUNCTION__, __LINE__, result);
+    }
+
     if (_dbStmtCache) CFRelease(_dbStmtCache);
     _dbStmtCache = NULL;
-    
-    do {
-        retry = NO;
-        result = sqlite3_close(_db);
-        if (result == SQLITE_BUSY || result == SQLITE_LOCKED) {
-            if (!stmtFinalized) {
-                stmtFinalized = YES;
-                sqlite3_stmt *stmt;
-                while ((stmt = sqlite3_next_stmt(_db, nil)) != 0) {
-                    sqlite3_finalize(stmt);
-                    retry = YES;
-                }
-            }
-        } else if (result != SQLITE_OK) {
-            if (_errorLogsEnabled) {
-                NSLog(@"%s line:%d sqlite close failed (%d).", __FUNCTION__, __LINE__, result);
-            }
-        }
-    } while (retry);
     _db = NULL;
     return YES;
 }
