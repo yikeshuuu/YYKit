@@ -153,26 +153,30 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
 + (NSData *)yy_archivedDataWithRootObject:(id)rootObject {
     if (!rootObject) return nil;
     NSMutableData *data = [NSMutableData data];
-    YYTextArchiver *archiver = [[[self class] alloc] initForWritingWithMutableData:data];
+    YYTextArchiver *archiver = [[[self class] alloc] initRequiringSecureCoding:NO];
+    [archiver setOutputFormat:NSPropertyListBinaryFormat_v1_0];
     [archiver encodeRootObject:rootObject];
     [archiver finishEncoding];
-    return data;
+    return archiver.encodedData;
 }
 
 + (BOOL)archiveRootObject:(id)rootObject toFile:(NSString *)path {
     NSData *data = [self yy_archivedDataWithRootObject:rootObject];
     if (!data) return NO;
-    return [data writeToFile:path atomically:YES];
+    return [data writeToFile:path options:NSDataWritingAtomic error:nil];
 }
 
 - (instancetype)init {
-    self = [super init];
-    self.delegate = self;
-    return self;
+    return [self initRequiringSecureCoding:NO];
 }
 
 - (instancetype)initForWritingWithMutableData:(NSMutableData *)data {
-    self = [super initForWritingWithMutableData:data];
+    self = [self initRequiringSecureCoding:NO];
+    return self;
+}
+
+- (instancetype)initRequiringSecureCoding:(BOOL)requiresSecureCoding {
+    self = [super initRequiringSecureCoding:requiresSecureCoding];
     self.delegate = self;
     return self;
 }
@@ -202,23 +206,29 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
 
 + (id)yy_unarchiveObjectWithData:(NSData *)data {
     if (data.length == 0) return nil;
-    YYTextUnarchiver *unarchiver = [[self alloc] initForReadingWithData:data];
+    NSError *error = nil;
+    YYTextUnarchiver *unarchiver = [[self alloc] initForReadingFromData:data error:&error];
+    if (!unarchiver) return nil;
     return [unarchiver decodeObject];
 }
 
 + (id)unarchiveObjectWithFile:(NSString *)path {
-    NSData *data = [NSData dataWithContentsOfFile:path];
+    NSError *error = nil;
+    NSData *data = [NSData dataWithContentsOfFile:path options:0 error:&error];
+    if (!data) return nil;
     return [self yy_unarchiveObjectWithData:data];
 }
 
 - (instancetype)init {
-    self = [super init];
-    self.delegate = self;
-    return self;
+    return [self initForReadingFromData:[NSData data] error:nil];
 }
 
 - (instancetype)initForReadingWithData:(NSData *)data {
-    self = [super initForReadingWithData:data];
+    return [self initForReadingFromData:data error:nil];
+}
+
+- (instancetype)initForReadingFromData:(NSData *)data error:(NSError **)error {
+    self = [super initForReadingFromData:data error:error];
     self.delegate = self;
     return self;
 }

@@ -491,18 +491,18 @@ typedef NS_ENUM(NSUInteger, YYAnimatedImageType) {
     
     dispatch_async_on_main_queue(^{
         LOCK(
-             [_requestQueue cancelAllOperations];
-             [_buffer removeAllObjects];
+             [self->_requestQueue cancelAllOperations];
+             [self->_buffer removeAllObjects];
              [self willChangeValueForKey:@"currentAnimatedImageIndex"];
-             _curIndex = currentAnimatedImageIndex;
+             self->_curIndex = currentAnimatedImageIndex;
              [self didChangeValueForKey:@"currentAnimatedImageIndex"];
-             _curFrame = [_curAnimatedImage animatedImageFrameAtIndex:_curIndex];
-             if (_curImageHasContentsRect) {
-                 _curContentsRect = [_curAnimatedImage animatedImageContentsRectAtIndex:_curIndex];
+             self->_curFrame = [_curAnimatedImage animatedImageFrameAtIndex:self->_curIndex];
+             if (self->_curImageHasContentsRect) {
+                 self->_curContentsRect = [self->_curAnimatedImage animatedImageContentsRectAtIndex:self->_curIndex];
              }
-             _time = 0;
-             _loopEnd = NO;
-             _bufferMiss = NO;
+             self->_time = 0;
+             self->_loopEnd = NO;
+             self->_bufferMiss = NO;
              [self.layer setNeedsDisplay];
          )//LOCK
     });
