@@ -159,11 +159,14 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
     return archiver.encodedData;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (BOOL)archiveRootObject:(id)rootObject toFile:(NSString *)path {
     NSData *data = [self yy_archivedDataWithRootObject:rootObject];
     if (!data) return NO;
     return [data writeToFile:path options:NSDataWritingAtomic error:nil];
 }
+#pragma clang diagnostic pop
 
 - (instancetype)initRequiringSecureCoding:(BOOL)requiresSecureCoding {
     self = [super initRequiringSecureCoding:requiresSecureCoding];
