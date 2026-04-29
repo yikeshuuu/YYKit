@@ -355,8 +355,8 @@ static void URLInBlackListAdd(NSURL *url) {
                 if (image || (_options & YYWebImageOptionRefreshImageCache)) {
                     NSData *data = _data;
                     dispatch_async([YYWebImageOperation _imageQueue], ^{
-                        YYImageCacheType cacheType = (_options & YYWebImageOptionIgnoreDiskCache) ? YYImageCacheTypeMemory : YYImageCacheTypeAll;
-                        [_cache setImage:image imageData:data forKey:_cacheKey withType:cacheType];
+                        YYImageCacheType cacheType = (self->_options & YYWebImageOptionIgnoreDiskCache) ? YYImageCacheTypeMemory : YYImageCacheTypeAll;
+                        [self->_cache setImage:image imageData:data forKey:self->_cacheKey withType:cacheType];
 
                     });
                 }

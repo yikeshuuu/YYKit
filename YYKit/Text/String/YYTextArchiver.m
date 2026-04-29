@@ -150,7 +150,7 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
 
 @implementation YYTextArchiver
 
-+ (NSData *)archivedDataWithRootObject:(id)rootObject {
++ (NSData *)yy_archivedDataWithRootObject:(id)rootObject {
     if (!rootObject) return nil;
     NSMutableData *data = [NSMutableData data];
     YYTextArchiver *archiver = [[[self class] alloc] initForWritingWithMutableData:data];
@@ -160,7 +160,7 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
 }
 
 + (BOOL)archiveRootObject:(id)rootObject toFile:(NSString *)path {
-    NSData *data = [self archivedDataWithRootObject:rootObject];
+    NSData *data = [self yy_archivedDataWithRootObject:rootObject];
     if (!data) return NO;
     return [data writeToFile:path atomically:YES];
 }
@@ -200,7 +200,7 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
 
 @implementation YYTextUnarchiver
 
-+ (id)unarchiveObjectWithData:(NSData *)data {
++ (id)yy_unarchiveObjectWithData:(NSData *)data {
     if (data.length == 0) return nil;
     YYTextUnarchiver *unarchiver = [[self alloc] initForReadingWithData:data];
     return [unarchiver decodeObject];
@@ -208,7 +208,7 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
 
 + (id)unarchiveObjectWithFile:(NSString *)path {
     NSData *data = [NSData dataWithContentsOfFile:path];
-    return [self unarchiveObjectWithData:data];
+    return [self yy_unarchiveObjectWithData:data];
 }
 
 - (instancetype)init {

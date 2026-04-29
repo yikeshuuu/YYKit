@@ -28,7 +28,7 @@ YYSYNTH_DUMMY_CLASS(NSAttributedString_YYText)
 - (NSData *)archiveToData {
     NSData *data = nil;
     @try {
-        data = [YYTextArchiver archivedDataWithRootObject:self];
+        data = [YYTextArchiver yy_archivedDataWithRootObject:self];
     }
     @catch (NSException *exception) {
         NSLog(@"%@",exception);
@@ -39,7 +39,7 @@ YYSYNTH_DUMMY_CLASS(NSAttributedString_YYText)
 + (instancetype)unarchiveFromData:(NSData *)data {
     NSAttributedString *one = nil;
     @try {
-        one = [YYTextUnarchiver unarchiveObjectWithData:data];
+        one = [YYTextUnarchiver yy_unarchiveObjectWithData:data];
     }
     @catch (NSException *exception) {
         NSLog(@"%@",exception);

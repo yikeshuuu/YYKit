@@ -940,7 +940,7 @@ fail:
 #pragma mark - Coding
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
-    NSData *textData = [YYTextArchiver archivedDataWithRootObject:_text];
+    NSData *textData = [YYTextArchiver yy_archivedDataWithRootObject:_text];
     [aCoder encodeObject:textData forKey:@"text"];
     [aCoder encodeObject:_container forKey:@"container"];
     [aCoder encodeObject:[NSValue valueWithRange:_range] forKey:@"range"];
@@ -948,7 +948,7 @@ fail:
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     NSData *textData = [aDecoder decodeObjectForKey:@"text"];
-    NSAttributedString *text = [YYTextUnarchiver unarchiveObjectWithData:textData];
+    NSAttributedString *text = [YYTextUnarchiver yy_unarchiveObjectWithData:textData];
     YYTextContainer *container = [aDecoder decodeObjectForKey:@"container"];
     NSRange range = ((NSValue *)[aDecoder decodeObjectForKey:@"range"]).rangeValue;
     self = [self.class layoutWithContainer:container text:text range:range];

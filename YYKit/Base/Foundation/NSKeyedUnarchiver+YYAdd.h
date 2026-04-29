@@ -16,7 +16,15 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Provides extensions for `NSKeyedUnarchiver`.
  */
+@interface NSKeyedArchiver (YYAdd)
+
++ (nullable NSData *)yy_archivedDataWithRootObject:(id)rootObject;
+
+@end
+
 @interface NSKeyedUnarchiver (YYAdd)
+
++ (nullable id)yy_unarchiveObjectWithData:(NSData *)data;
 
 /**
  Same as unarchiveObjectWithData:, except it returns the exception by reference.

@@ -15,12 +15,40 @@
 YYSYNTH_DUMMY_CLASS(NSKeyedUnarchiver_YYAdd)
 
 
+@implementation NSKeyedArchiver (YYAdd)
+
++ (NSData *)yy_archivedDataWithRootObject:(id)rootObject {
+    if (!rootObject) return nil;
+    if (@available(iOS 11.0, tvOS 11.0, macOS 10.13, watchOS 4.0, *)) {
+        NSError *error = nil;
+        return [NSKeyedArchiver archivedDataWithRootObject:rootObject requiringSecureCoding:NO error:&error];
+    }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    return [NSKeyedArchiver archivedDataWithRootObject:rootObject];
+#pragma clang diagnostic pop
+}
+
+@end
+
 @implementation NSKeyedUnarchiver (YYAdd)
+
++ (id)yy_unarchiveObjectWithData:(NSData *)data {
+    if (!data) return nil;
+    if (@available(iOS 11.0, tvOS 11.0, macOS 10.13, watchOS 4.0, *)) {
+        NSError *error = nil;
+        return [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSArray class], [NSDictionary class], [NSSet class], [NSString class], [NSNumber class], [NSData class], [NSDate class], [NSURL class], [NSValue class], [NSNull class], nil] fromData:data error:&error];
+    }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+#pragma clang diagnostic pop
+}
 
 + (id)unarchiveObjectWithData:(NSData *)data exception:(__autoreleasing NSException **)exception {
     id object = nil;
     @try {
-        object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        object = [self yy_unarchiveObjectWithData:data];
     }
     @catch (NSException *e)
     {
@@ -34,9 +62,10 @@ YYSYNTH_DUMMY_CLASS(NSKeyedUnarchiver_YYAdd)
 
 + (id)unarchiveObjectWithFile:(NSString *)path exception:(__autoreleasing NSException **)exception {
     id object = nil;
-    
+
     @try {
-        object = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        object = [self yy_unarchiveObjectWithData:data];
     }
     @catch (NSException *e)
     {

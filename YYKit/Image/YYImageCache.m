@@ -15,6 +15,7 @@
 #import "UIImage+YYAdd.h"
 #import "NSObject+YYAdd.h"
 #import "YYImage.h"
+#import "NSKeyedUnarchiver+YYAdd.h"
 
 #if __has_include("YYDispatchQueuePool.h")
 #import "YYDispatchQueuePool.h"
@@ -60,7 +61,7 @@ static inline dispatch_queue_t YYImageCacheDecodeQueue(void) {
     NSData *scaleData = [YYDiskCache getExtendedDataFromObject:data];
     CGFloat scale = 0;
     if (scaleData) {
-        scale = ((NSNumber *)[NSKeyedUnarchiver unarchiveObjectWithData:scaleData]).doubleValue;
+        scale = ((NSNumber *)[NSKeyedUnarchiver yy_unarchiveObjectWithData:scaleData]).doubleValue;
     }
     if (scale <= 0) scale = [UIScreen mainScreen].scale;
     UIImage *image;
@@ -146,7 +147,7 @@ static inline dispatch_queue_t YYImageCacheDecodeQueue(void) {
     if (type & YYImageCacheTypeDisk) { // add to disk cache
         if (imageData) {
             if (image) {
-                [YYDiskCache setExtendedData:[NSKeyedArchiver archivedDataWithRootObject:@(image.scale)] toObject:imageData];
+                [YYDiskCache setExtendedData:[NSKeyedArchiver yy_archivedDataWithRootObject:@(image.scale)] toObject:imageData];
             }
             [_diskCache setObject:imageData forKey:key];
         } else if (image) {
@@ -154,7 +155,7 @@ static inline dispatch_queue_t YYImageCacheDecodeQueue(void) {
                 __strong typeof(_self) self = _self;
                 if (!self) return;
                 NSData *data = [image imageDataRepresentation];
-                [YYDiskCache setExtendedData:[NSKeyedArchiver archivedDataWithRootObject:@(image.scale)] toObject:data];
+                [YYDiskCache setExtendedData:[NSKeyedArchiver yy_archivedDataWithRootObject:@(image.scale)] toObject:data];
                 [self.diskCache setObject:data forKey:key];
             });
         }

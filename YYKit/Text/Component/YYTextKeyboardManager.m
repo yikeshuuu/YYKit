@@ -497,8 +497,10 @@ static int _YYTextKeyboardViewFrameObserverKey;
     if (!view) return [mainWindow convertRect:rect toWindow:nil];
     UIWindow *toWindow = [view isKindOfClass:[UIWindow class]] ? (id)view : view.window;
     if (!toWindow) return [mainWindow convertRect:rect toView:view];
-    if (mainWindow.windowScene && toWindow.windowScene && mainWindow.windowScene != toWindow.windowScene) {
-        mainWindow = [UIApplication yy_keyWindowForView:view] ?: toWindow;
+    if (@available(iOS 13.0, *)) {
+        if (mainWindow.windowScene && toWindow.windowScene && mainWindow.windowScene != toWindow.windowScene) {
+            mainWindow = [UIApplication yy_keyWindowForView:view] ?: toWindow;
+        }
     }
     if (!mainWindow) return [view convertRect:rect fromView:nil];
 

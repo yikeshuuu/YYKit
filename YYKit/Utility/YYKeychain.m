@@ -12,6 +12,7 @@
 #import "YYKeychain.h"
 #import "UIDevice+YYAdd.h"
 #import "YYKitMacro.h"
+#import "NSKeyedUnarchiver+YYAdd.h"
 #import <Security/Security.h>
 
 
@@ -78,7 +79,7 @@ static NSString *YYKeychainAccessibleStr(YYKeychainAccessible e) {
         case YYKeychainAccessibleAfterFirstUnlock:
             return (__bridge NSString *)(kSecAttrAccessibleAfterFirstUnlock);
         case YYKeychainAccessibleAlways:
-            return (__bridge NSString *)(kSecAttrAccessibleAlways);
+            return (__bridge NSString *)(kSecAttrAccessibleAfterFirstUnlock);
         case YYKeychainAccessibleWhenPasscodeSetThisDeviceOnly:
             return (__bridge NSString *)(kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly);
         case YYKeychainAccessibleWhenUnlockedThisDeviceOnly:
@@ -86,7 +87,7 @@ static NSString *YYKeychainAccessibleStr(YYKeychainAccessible e) {
         case YYKeychainAccessibleAfterFirstUnlockThisDeviceOnly:
             return (__bridge NSString *)(kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly);
         case YYKeychainAccessibleAlwaysThisDeviceOnly:
-            return (__bridge NSString *)(kSecAttrAccessibleAlwaysThisDeviceOnly);
+            return (__bridge NSString *)(kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly);
         default:
             return nil;
     }
@@ -97,7 +98,12 @@ static YYKeychainAccessible YYKeychainAccessibleEnum(NSString *s) {
         return YYKeychainAccessibleWhenUnlocked;
     if ([s isEqualToString:(__bridge NSString *)kSecAttrAccessibleAfterFirstUnlock])
         return YYKeychainAccessibleAfterFirstUnlock;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     if ([s isEqualToString:(__bridge NSString *)kSecAttrAccessibleAlways])
+        return YYKeychainAccessibleAlways;
+#pragma clang diagnostic pop
+    if ([s isEqualToString:(__bridge NSString *)kSecAttrAccessibleAfterFirstUnlock])
         return YYKeychainAccessibleAlways;
     if ([s isEqualToString:(__bridge NSString *)kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly])
         return YYKeychainAccessibleWhenPasscodeSetThisDeviceOnly;
@@ -105,7 +111,12 @@ static YYKeychainAccessible YYKeychainAccessibleEnum(NSString *s) {
         return YYKeychainAccessibleWhenUnlockedThisDeviceOnly;
     if ([s isEqualToString:(__bridge NSString *)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly])
         return YYKeychainAccessibleAfterFirstUnlockThisDeviceOnly;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     if ([s isEqualToString:(__bridge NSString *)kSecAttrAccessibleAlwaysThisDeviceOnly])
+        return YYKeychainAccessibleAlwaysThisDeviceOnly;
+#pragma clang diagnostic pop
+    if ([s isEqualToString:(__bridge NSString *)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly])
         return YYKeychainAccessibleAlwaysThisDeviceOnly;
     return YYKeychainAccessibleNone;
 }
@@ -138,12 +149,12 @@ static YYKeychainQuerySynchronizationMode YYKeychainQuerySynchonizationEnum(NSNu
 
 
 - (void)setPasswordObject:(id <NSCoding> )object {
-    self.passwordData = [NSKeyedArchiver archivedDataWithRootObject:object];
+    self.passwordData = [NSKeyedArchiver yy_archivedDataWithRootObject:object];
 }
 
 - (id <NSCoding> )passwordObject {
     if ([self.passwordData length]) {
-        return [NSKeyedUnarchiver unarchiveObjectWithData:self.passwordData];
+        return [NSKeyedUnarchiver yy_unarchiveObjectWithData:self.passwordData];
     }
     return nil;
 }
@@ -362,7 +373,7 @@ static YYKeychainQuerySynchronizationMode YYKeychainQuerySynchonizationEnum(NSNu
     }
     
     NSMutableDictionary *query = [item dic];
-    OSStatus status = status = SecItemAdd((__bridge CFDictionaryRef)query, NULL);
+    OSStatus status = SecItemAdd((__bridge CFDictionaryRef)query, NULL);
     if (status != errSecSuccess) {
         if (error) *error = [YYKeychain errorWithCode:status];
         return NO;

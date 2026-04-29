@@ -343,13 +343,13 @@ typedef NS_ENUM(NSUInteger, YYAnimatedImageType) {
 - (void)didReceiveMemoryWarning:(NSNotification *)notification {
     [_requestQueue cancelAllOperations];
     [_requestQueue addOperationWithBlock: ^{
-        _incrBufferCount = -60 - (int)(arc4random() % 120); // about 1~3 seconds to grow back..
-        NSNumber *next = @((_curIndex + 1) % _totalFrameCount);
+        self->_incrBufferCount = -60 - (int)(arc4random() % 120); // about 1~3 seconds to grow back..
+        NSNumber *next = @((self->_curIndex + 1) % self->_totalFrameCount);
         LOCK(
-             NSArray * keys = _buffer.allKeys;
+             NSArray * keys = self->_buffer.allKeys;
              for (NSNumber * key in keys) {
                  if (![key isEqualToNumber:next]) { // keep the next frame for smoothly animation
-                     [_buffer removeObjectForKey:key];
+                     [self->_buffer removeObjectForKey:key];
                  }
              }
         )//LOCK

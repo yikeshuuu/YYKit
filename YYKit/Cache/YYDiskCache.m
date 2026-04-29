@@ -13,6 +13,7 @@
 #import "YYKVStorage.h"
 #import "NSString+YYAdd.h"
 #import "UIDevice+YYAdd.h"
+#import "NSKeyedUnarchiver+YYAdd.h"
 #import <objc/runtime.h>
 #import <time.h>
 
@@ -225,7 +226,15 @@ static void _YYDiskCacheSetGlobal(YYDiskCache *cache) {
         object = _customUnarchiveBlock(item.value);
     } else {
         @try {
-            object = [NSKeyedUnarchiver unarchiveObjectWithData:item.value];
+            if (@available(iOS 11.0, tvOS 11.0, macOS 10.13, watchOS 4.0, *)) {
+                NSError *error = nil;
+                object = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSArray class], [NSDictionary class], [NSSet class], [NSString class], [NSNumber class], [NSData class], [NSDate class], [NSURL class], [NSValue class], [NSNull class], nil] fromData:item.value error:&error];
+                if (!object && error) {
+                    object = [NSKeyedUnarchiver yy_unarchiveObjectWithData:item.value];
+                }
+            } else {
+                object = [NSKeyedUnarchiver yy_unarchiveObjectWithData:item.value];
+            }
         }
         @catch (NSException *exception) {
             // nothing to do...
@@ -260,7 +269,7 @@ static void _YYDiskCacheSetGlobal(YYDiskCache *cache) {
         value = _customArchiveBlock(object);
     } else {
         @try {
-            value = [NSKeyedArchiver archivedDataWithRootObject:object];
+            value = [NSKeyedArchiver yy_archivedDataWithRootObject:object];
         }
         @catch (NSException *exception) {
             // nothing to do...

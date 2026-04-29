@@ -128,8 +128,8 @@ dispatch_semaphore_signal(_lock);
     LOCK(NSArray * a = [_dic keysSortedByValueUsingSelector:comparator]); return a;
 }
 
-- (void)getObjects:(id __unsafe_unretained[])objects andKeys:(id __unsafe_unretained[])keys {
-    LOCK([_dic getObjects:objects andKeys:keys]);
+- (void)getObjects:(__unsafe_unretained id _Nullable [])objects andKeys:(__unsafe_unretained id _Nullable [])keys count:(NSUInteger)count {
+    LOCK([_dic getObjects:objects andKeys:keys count:count]);
 }
 
 - (id)objectForKeyedSubscript:(id)key {

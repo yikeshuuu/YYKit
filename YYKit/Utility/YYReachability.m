@@ -77,7 +77,7 @@ static void YYReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     if (!ref) return nil;
     self = super.init;
     if (!self) return nil;
-    _ref = ref;
+    _ref = CFRetain(ref);
     _allowWWAN = YES;
     if (NSFoundationVersionNumber >= NSFoundationVersionNumber_iOS_7_0) {
         _networkInfo = [CTTelephonyNetworkInfo new];
@@ -115,7 +115,15 @@ static void YYReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 
 - (YYReachabilityWWANStatus)wwanStatus {
     if (!self.networkInfo) return YYReachabilityWWANStatusNone;
-    NSString *status = self.networkInfo.currentRadioAccessTechnology;
+    NSString *status = nil;
+    if (@available(iOS 12.0, *)) {
+        status = self.networkInfo.serviceCurrentRadioAccessTechnology.allValues.firstObject;
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        status = self.networkInfo.currentRadioAccessTechnology;
+#pragma clang diagnostic pop
+    }
     if (!status) return YYReachabilityWWANStatusNone;
     static NSDictionary *dic;
     static dispatch_once_t onceToken;
@@ -158,12 +166,16 @@ static void YYReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 
 + (instancetype)reachabilityWithHostname:(NSString *)hostname {
     SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithName(NULL, [hostname UTF8String]);
-    return [[self alloc] initWithRef:ref];
+    YYReachability *reachability = [[self alloc] initWithRef:ref];
+    if (ref) CFRelease(ref);
+    return reachability;
 }
 
 + (instancetype)reachabilityWithAddress:(const struct sockaddr *)hostAddress {
     SCNetworkReachabilityRef ref = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, (const struct sockaddr *)hostAddress);
-    return [[self alloc] initWithRef:ref];
+    YYReachability *reachability = [[self alloc] initWithRef:ref];
+    if (ref) CFRelease(ref);
+    return reachability;
 }
 
 - (void)setNotifyBlock:(void (^)(YYReachability *reachability))notifyBlock {

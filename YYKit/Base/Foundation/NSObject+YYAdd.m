@@ -11,6 +11,7 @@
 
 #import "NSObject+YYAdd.h"
 #import "YYKitMacro.h"
+#import "NSKeyedUnarchiver+YYAdd.h"
 #import <objc/objc.h>
 #import <objc/runtime.h>
 
@@ -398,7 +399,7 @@ else if (size <= 4 * _size_ ) { \
 - (id)deepCopy {
     id obj = nil;
     @try {
-        obj = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
+        obj = [NSKeyedUnarchiver yy_unarchiveObjectWithData:[NSKeyedArchiver yy_archivedDataWithRootObject:self]];
     }
     @catch (NSException *exception) {
         NSLog(@"%@", exception);
@@ -409,7 +410,7 @@ else if (size <= 4 * _size_ ) { \
 - (id)deepCopyWithArchiver:(Class)archiver unarchiver:(Class)unarchiver {
     id obj = nil;
     @try {
-        obj = [unarchiver unarchiveObjectWithData:[archiver archivedDataWithRootObject:self]];
+        obj = [unarchiver unarchiveObjectWithData:[archiver yy_archivedDataWithRootObject:self]];
     }
     @catch (NSException *exception) {
         NSLog(@"%@", exception);
