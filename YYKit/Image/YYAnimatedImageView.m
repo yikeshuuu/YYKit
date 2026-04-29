@@ -496,7 +496,7 @@ typedef NS_ENUM(NSUInteger, YYAnimatedImageType) {
              [self willChangeValueForKey:@"currentAnimatedImageIndex"];
              self->_curIndex = currentAnimatedImageIndex;
              [self didChangeValueForKey:@"currentAnimatedImageIndex"];
-             self->_curFrame = [_curAnimatedImage animatedImageFrameAtIndex:self->_curIndex];
+             self->_curFrame = [self->_curAnimatedImage animatedImageFrameAtIndex:self->_curIndex];
              if (self->_curImageHasContentsRect) {
                  self->_curContentsRect = [self->_curAnimatedImage animatedImageContentsRectAtIndex:self->_curIndex];
              }

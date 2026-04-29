@@ -152,7 +152,6 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
 
 + (NSData *)yy_archivedDataWithRootObject:(id)rootObject {
     if (!rootObject) return nil;
-    NSMutableData *data = [NSMutableData data];
     YYTextArchiver *archiver = [[[self class] alloc] initRequiringSecureCoding:NO];
     [archiver setOutputFormat:NSPropertyListBinaryFormat_v1_0];
     [archiver encodeRootObject:rootObject];
@@ -164,15 +163,6 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
     NSData *data = [self yy_archivedDataWithRootObject:rootObject];
     if (!data) return NO;
     return [data writeToFile:path options:NSDataWritingAtomic error:nil];
-}
-
-- (instancetype)init {
-    return [self initRequiringSecureCoding:NO];
-}
-
-- (instancetype)initForWritingWithMutableData:(NSMutableData *)data {
-    self = [self initRequiringSecureCoding:NO];
-    return self;
 }
 
 - (instancetype)initRequiringSecureCoding:(BOOL)requiresSecureCoding {
@@ -212,20 +202,15 @@ static CFTypeID CTRubyAnnotationTypeID(void) {
     return [unarchiver decodeObject];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (id)unarchiveObjectWithFile:(NSString *)path {
     NSError *error = nil;
     NSData *data = [NSData dataWithContentsOfFile:path options:0 error:&error];
     if (!data) return nil;
     return [self yy_unarchiveObjectWithData:data];
 }
-
-- (instancetype)init {
-    return [self initForReadingFromData:[NSData data] error:nil];
-}
-
-- (instancetype)initForReadingWithData:(NSData *)data {
-    return [self initForReadingFromData:data error:nil];
-}
+#pragma clang diagnostic pop
 
 - (instancetype)initForReadingFromData:(NSData *)data error:(NSError **)error {
     self = [super initForReadingFromData:data error:error];
